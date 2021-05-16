@@ -23,7 +23,6 @@ class BotClass:
         self.health = health
         self.max_vel = 2
         self.max_force = 0.5
-        self.size = 5
         self.age = 1
         self.bot_type = bot_type
         self.reproduction_rate = reproduction_rate
@@ -120,21 +119,21 @@ class BotClass:
     def eat_bot(self, list_of_bots, index, edible_bot_type):
         closest = None
         closest_distance = max(constants.game_width_const, constants.game_height_const)
-        print('closest_distance')
-        print(closest_distance)
+        # print('closest_distance')
+        # print(closest_distance)
         bot_x = self.position[0]
         bot_y = self.position[1]
         for bot_food in list_of_bots:
             if bot_food == self:
                 break
-            print('alllooo')
-            print(bot_food.position[0])
-            print(bot_food.position[1])
+            # print('alllooo')
+            # print(bot_food.position[0])
+            # print(bot_food.position[1])
             item_x = bot_food.position[0]
             item_y = bot_food.position[1]
             distance = math.hypot(bot_x - item_x, bot_y - item_y)
-            print('distance')
-            print(distance)
+            # print('distance')
+            # print(distance)
             if distance < 5:
                 if bot_food.bot_type != edible_bot_type:
                     break
@@ -142,9 +141,9 @@ class BotClass:
                 self.health += self.nutrition[index]
                 break
             if distance < closest_distance:
-                print('AHAAAA')
+                # print('AHAAAA')
                 if bot_food.bot_type != edible_bot_type:
-                    print('tuka?')
+                    # print('tuka?')
                     break
                 closest_distance = distance
                 closest = bot_food

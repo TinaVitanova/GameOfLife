@@ -1,6 +1,5 @@
 import pygame
 import random
-import math
 import numpy
 import time
 import constants
@@ -8,7 +7,6 @@ import pygame_screen
 import food_array
 import bots_array
 import genetic_bot_class
-
 
 poison = []
 
@@ -20,9 +18,11 @@ def main():
 
     # initially start with 10 random bots (random dna)
     for i in range(10):
-        bots_array.add_bots(genetic_bot_class.BotClass(random.uniform(0, constants.game_width_const), random.uniform(0, constants.game_height_const), 1))
+        bots_array.add_bots(genetic_bot_class.BotClass(random.uniform(0, constants.game_width_const),
+                                                       random.uniform(0, constants.game_height_const), 1))
     for i in range(1):
-        bots_array.add_bots(genetic_bot_class.BotClass(random.uniform(0, constants.game_width_const), random.uniform(0, constants.game_height_const), 2))
+        bots_array.add_bots(genetic_bot_class.BotClass(random.uniform(0, constants.game_width_const),
+                                                       random.uniform(0, constants.game_height_const), 2))
     running = True
     while running:
         time.sleep(0.05)
@@ -34,15 +34,21 @@ def main():
             food_array.add_food(numpy.array([random.uniform(constants.boundary_size_const,
                                                             constants.game_width_const - constants.boundary_size_const),
                                              random.uniform(constants.boundary_size_const,
-                                                            constants.game_height_const - constants.boundary_size_const)], dtype='float64'))
+                                                            constants.game_height_const -
+                                                            constants.boundary_size_const)], dtype='float64'))
         if random.random() < 0.01:
-            poison.append(numpy.array([random.uniform(constants.boundary_size_const, constants.game_width_const - constants.boundary_size_const),
-                                       random.uniform(constants.boundary_size_const, constants.game_height_const - constants.boundary_size_const)],
+            poison.append(numpy.array([random.uniform(constants.boundary_size_const,
+                                                      constants.game_width_const - constants.boundary_size_const),
+                                       random.uniform(constants.boundary_size_const,
+                                                      constants.game_height_const - constants.boundary_size_const)],
                                       dtype='float64'))
         if len(poison) > constants.max_poison_const:
             poison.pop(0)
 
         for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # If the user clicked on the input_box rect.
+                print(event)
             if event.type == pygame.QUIT:
                 running = False
 
