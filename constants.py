@@ -1,4 +1,4 @@
-game_width_const = 800
+game_width_const = 1300
 game_height_const = 600
 white_const = (255, 255, 255)
 black_const = (0, 0, 0)
