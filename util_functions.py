@@ -2,11 +2,8 @@ import constants
 
 
 def magnitude_calc(vector):
-    x = 0
-    for index in vector:
-        x += index ** 2
-    magnitude = x ** 0.5
-    return magnitude
+    x = sum(index ** 2 for index in vector)
+    return x ** 0.5
 
 
 def normalise(vector):
@@ -17,6 +14,25 @@ def normalise(vector):
 
 
 def lerp(bot):
-    percent_health = bot.health / constants.health_const
-    lerped_colour = (max(min((1 - percent_health) * 255, 255), 0), max(min(percent_health * 255, 255), 0), 0)
-    return lerped_colour
+    # Change color of bot according to it's health
+    percent_health = bot.health / constants.botsValues.get_attr("health" + bot.suffix)
+    return (
+        int(max(min((1 - percent_health) * 255, 255), 0)),
+        int(max(min(percent_health * 255, 255), 0)),
+        0,
+    )
+
+
+def validate_dna(new_value, old_value, validation=''):
+    if validation == 'greater_than_zero':
+        return new_value if new_value > 0 else old_value
+    if validation == 'zero_or_above:':
+        return new_value if new_value >= 0 else old_value
+    return new_value
+
+
+def get_plot_values(plot_data):
+    x_val = [x[0] for x in plot_data]
+    y_val = [x[1] for x in plot_data]
+    return x_val, y_val
+
