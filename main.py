@@ -1,5 +1,7 @@
 import random
 import threading
+import bisect
+from datetime import datetime, timedelta
 
 import numpy
 import pygame
@@ -14,7 +16,8 @@ from button import Button
 from food_poison_array import FoodArray, PoisonArray
 from input import InputBox
 from statistics import stats
-
+from interval import ThreadJob
+from util_functions import are_array_values_increasing
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -35,32 +38,119 @@ BUTTON_STYLE = {"hover_color": (0, 180, 0),
 running = True
 # game_set is used for switching between set game window and the game window
 game_set = False
+# which bot to show data for, if it's empty will show nothing
+show_data_bot = None
+
+event = threading.Event()
 
 
 def save_statistics():
     threading.Timer(5.0, save_statistics).start()
 
 
+def set_stats():
+    sum_age_c = 0
+    sum_age_h = 0
+    num_bots_h = 0
+    num_bots_c = 0
+    for bot in bots_array.get_bots()[::-1]:
+        if bot.bot_type == 1:
+            sum_age_h += bot.age
+            num_bots_h += 1
+        else:
+            sum_age_c += bot.age
+            num_bots_c += 1
+    avg_age_c = 0 if num_bots_c == 0 else sum_age_c / num_bots_c
+    avg_age_h = 0 if num_bots_h == 0 else sum_age_h / num_bots_h
+    stats.update_age('avg_age_c', avg_age_c)
+    stats.update_age('avg_age_h', avg_age_h)
+
+
+def end_game():
+    statistics = vars(stats)
+    # xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
+    xfmt = md.DateFormatter('%H:%M:%S')
+    for i, stat_name in enumerate(statistics):
+        plt.figure(i + 1)
+        ax = plt.gca()
+        plt.subplots_adjust(bottom=0.2)
+        plt.xticks(rotation=45)
+        plt.title(stat_name.replace("_", " ").capitalize())
+        ax.xaxis.set_major_formatter(xfmt)
+        stat = stats.get_statistics(stat_name)
+        plt.scatter(*zip(*stat))
+    plt.show()
+    set_game()
+
+
+def check_termination_conditions():
+    global game_set
+    num_bots_c = stats.get_statistics('num_c_bots')
+    num_bots_h = stats.get_statistics('num_h_bots')
+    dt = md.date2num(datetime.now() - timedelta(minutes=2))
+    datetime_arr_c, stats_arr_c = zip(*num_bots_c)
+    datetime_arr_h, stats_arr_h = zip(*num_bots_h)
+    index_to_check_c = bisect.bisect_left(list(datetime_arr_c), dt)
+    index_to_check_h = bisect.bisect_left(list(datetime_arr_h), dt)
+    are_h_bots_increasing = (len(list(stats_arr_h)[index_to_check_h:]) > 1
+                             and are_array_values_increasing(list(stats_arr_h)[index_to_check_h:]))
+    are_c_bots_increasing = (len(list(stats_arr_c)[index_to_check_c:]) > 1
+                             and are_array_values_increasing(list(stats_arr_c)[index_to_check_c:]))
+    if are_c_bots_increasing and are_h_bots_increasing:
+        print('Terminated with stable env of both bot types')
+        end_game()
+    if (numpy.std(list(stats_arr_c)[index_to_check_c:]) < 0.1
+            and numpy.std(list(stats_arr_h)[index_to_check_h:]) < 0.1):
+        print('Terminated with stable-ish env of both bot types')
+        end_game()
+    elif are_c_bots_increasing:
+        print('Terminated with stable env of carnivore bot types')
+        end_game()
+    elif are_h_bots_increasing:
+        print('Terminated with stable env of herbivore bot types')
+        end_game()
+    elif numpy.std(list(stats_arr_h)[index_to_check_h:]) < 0.1:
+        print('Terminated with stable-ish env of herbivore types')
+        end_game()
+    elif numpy.std(list(stats_arr_c)[index_to_check_c:]) < 0.1:
+        print('Terminated with stable-ish env of carnivore types')
+        end_game()
+    else:
+        print('No achieved stable environment')
+
+
 def set_game():
+    global event
     global game_set
     if game_set:
         for bot in bots_array.get_bots():
             bot.be_eaten()
     else:
+        stats_update = ThreadJob(set_stats, event, 5)
+        termination_check = ThreadJob(check_termination_conditions, event, 500)
+
+        stats_update.start()
+        termination_check.start()
         # create n random bots at the start of the game form inputs
         for _ in range(getValue("num_of_herbivore_bots", 'INT')):
             stats.update_bots('num_h_bots', 'add')
-            bots_array.add_bots(BotClass(random.uniform(0, constants.game_width),
-                                         random.uniform(0, constants.game_height), 1))
+            bots_array.add_bots(BotClass(random.SystemRandom().uniform(0, constants.game_width),
+                                         random.SystemRandom().uniform(0, constants.game_height), 1))
         for _ in range(getValue("num_of_carnivore_bots", 'INT')):
             stats.update_bots('num_c_bots', 'add')
-            bots_array.add_bots(BotClass(random.uniform(0, constants.game_width),
-                                         random.uniform(0, constants.game_height), 2))
+            bots_array.add_bots(BotClass(random.SystemRandom().uniform(0, constants.game_width),
+                                         random.SystemRandom().uniform(0, constants.game_height), 2))
         save_statistics()
     game_set = not game_set
 
 
 def text_objects(text, font):
+    # create a text object and rectangle for an input box
+    text_surface = font.render(text, True, (0, 0, 200))
+    return text_surface, text_surface.get_rect()
+
+
+def show_data(text, font):
     # create a text object and rectangle for an input box
     text_surface = font.render(text, True, (0, 0, 200))
     return text_surface, text_surface.get_rect()
@@ -78,6 +168,7 @@ def message_display(text, x, y):
 def main():
     global game_set
     global running
+    global show_data_bot
     oldest_ever = 0
     oldest_ever_dna = []
 
@@ -149,7 +240,7 @@ def main():
                                           "steering_depletion_h")
     input_num_of_carnivore_bots = InputBox(630, 100, 150, 32,
                                            getValue("num_of_carnivore_bots", "STR"),
-                                           "num_of_carnivore_bots", "INT")
+                                           "num_of_carnivore_bots", "INT", 'zero_and_above')
     input_attr_to_food_c = InputBox(630, 160, 150, 32, getValue("attr_to_food_c", "STR"),
                                     "attr_to_food_c")
     input_steering_attr_c = InputBox(630, 220, 150, 32,
@@ -193,10 +284,10 @@ def main():
                                           "steering_depletion_c")
     input_max_food = InputBox(1210, 100, 150, 32,
                               str(getValue("max_food")),
-                              "max_food", "INT")
+                              "max_food", "INT", 'zero_and_above')
     input_max_poison = InputBox(1210, 160, 150, 32,
                                 str(getValue("max_poison")),
-                                "max_poison", "INT")
+                                "max_poison", "INT", 'zero_and_above')
     input_food_chance = InputBox(1210, 220, 150, 32,
                                  str(getValue("food_chance")),
                                  "food_chance")
@@ -231,45 +322,41 @@ def main():
         # Check if game is started with variables or not
         if game_set:
             # Go through all events and find key down == p for pausing the game
-            for event in pygame.event.get():
-                self_event = event
+            for pygame_event in pygame.event.get():
+                self_event = pygame_event
                 if self_event.type == pygame.KEYUP and self_event.key == pygame.K_p:
-                    statistics = vars(stats)
-                    # xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
-                    xfmt = md.DateFormatter('%H:%M:%S')
-                    for i, stat_name in enumerate(statistics):
-                        plt.figure(i + 1)
-                        ax = plt.gca()
-                        plt.subplots_adjust(bottom=0.2)
-                        plt.xticks(rotation=45)
-                        plt.title(stat_name.replace("_", " ").capitalize())
-                        ax.xaxis.set_major_formatter(xfmt)
-                        stat = stats.get_statistics(stat_name)
-                        plt.scatter(*zip(*stat))
-                    plt.show()
-                    set_game()
+                    end_game()
+
+                for bot in bots_array.get_bots()[::-1]:
+                    if bot.check_event(pygame_event):
+                        show_data_bot = bot
                 pygame.event.clear()
-            # if len(bots_array.get_bots) < 10 or random.random() < 0.0001:
-            #     bots_array.add_bots(BotClass(random.uniform(0, game_width), random.uniform(0, game_height), 2))
+            # if len(bots_array.get_bots) < 10 or random.SystemRandom().random() < 0.0001:
+            #     bots_array.add_bots(BotClass(random.SystemRandom().uniform(0, game_width),
+            #     random.SystemRandom().uniform(0, game_height), 2))
 
             # Generate foodstuffs in random places if there are not above their max limit
-            if random.random() < getValue("food_chance") and\
+            if random.SystemRandom().random() < getValue("food_chance") and \
                     len(food_array.get_food()) < getValue("max_food", 'INT'):
                 stats.update_foodstuffs('num_food', 'add')
                 # Add in num of food stat
-                food_array.add_food(numpy.array([random.uniform(constants.boundary_size,
-                                                                constants.game_width - constants.boundary_size),
-                                                 random.uniform(constants.boundary_size,
-                                                                constants.game_height -
-                                                                constants.boundary_size)], dtype='float32'))
-            if random.random() < getValue("poison_chance") and\
+                food_array.add_food(numpy.array([random.SystemRandom().uniform(constants.boundary_size,
+                                                                               constants.game_width -
+                                                                               constants.boundary_size),
+                                                 random.SystemRandom().uniform(constants.boundary_size,
+                                                                               constants.game_height -
+                                                                               constants.boundary_size)],
+                                                dtype='float32'))
+            if random.SystemRandom().random() < getValue("poison_chance") and \
                     len(poison_array.get_poison()) < getValue("max_poison", 'INT'):
                 stats.update_foodstuffs('num_poison', 'add')
                 # Add in num of poison stat
-                poison_array.add_poison(numpy.array([random.uniform(constants.boundary_size,
-                                                                    constants.game_width - constants.boundary_size),
-                                                     random.uniform(constants.boundary_size,
-                                                                    constants.game_height - constants.boundary_size)],
+                poison_array.add_poison(numpy.array([random.SystemRandom().uniform(constants.boundary_size,
+                                                                                   constants.game_width -
+                                                                                   constants.boundary_size),
+                                                     random.SystemRandom().uniform(constants.boundary_size,
+                                                                                   constants.game_height -
+                                                                                   constants.boundary_size)],
                                                     dtype='float32'))
             # Go through all bots and fire out eat method in order to search for food on every update
             for bot in bots_array.get_bots()[::-1]:
@@ -304,10 +391,21 @@ def main():
             for i in poison_array.get_poison():
                 pygame.draw.circle(pygame_screen.game_display, (255, 0, 0), (int(i[0]), int(i[1])), 3)
 
-            for event in pygame.event.get():
-                for bot in bots_array.get_bots()[::-1]:
-                    bot.check_event(event)
-                pygame.event.clear()
+            if show_data_bot:
+                message_display(f'X: {show_data_bot.position[0]}', 10, 20)
+                message_display(f'Y: {show_data_bot.position[1]}', 10, 40)
+                message_display(f'Health: {show_data_bot.health}', 10, 60)
+                message_display(f'Max health: {show_data_bot.dna[7]}', 10, 80)
+                message_display(f'Health depletion: {show_data_bot.dna[10]}', 10, 100)
+                message_display(f'Age: {show_data_bot.age / constants.fps}', 10, 120)
+                message_display(f'Velocity: {show_data_bot.dna[6]}', 10, 140)
+                message_display(f'Mutation rate: {show_data_bot.dna[5]}', 10, 160)
+                message_display(f'Reproduction rate: {show_data_bot.dna[4]}', 10, 180)
+                message_display(f'Attraction food: {show_data_bot.dna[0]}', 10, 200)
+                message_display(f'Nutrition food: {show_data_bot.dna[8]}', 10, 220)
+                if show_data_bot.bot_type == 1:
+                    message_display(f'Attraction poison: {show_data_bot.dna[1]}', 10, 240)
+                    message_display(f'Nutrition poison: {show_data_bot.dna[9]}', 10, 260)
         # If the game is still not set with variables allow the user to set it
         elif not game_set:
             message_display("Number of herbivore bots", 50, 95)
@@ -352,10 +450,10 @@ def main():
             message_display("Food chance", 1210, 215)
             message_display("Poison chance", 1210, 275)
             # Cycle through events for the input boxes and button to get their respective events
-            for event in pygame.event.get():
-                button.check_event(event)
+            for pygame_event in pygame.event.get():
+                button.check_event(pygame_event, input_boxes)
                 for box in input_boxes:
-                    box.handle_event(event)
+                    box.handle_event(pygame_event)
                 pygame.event.clear()
             button.update(pygame_screen.game_display)
 

@@ -36,3 +36,15 @@ def get_plot_values(plot_data):
     y_val = [x[1] for x in plot_data]
     return x_val, y_val
 
+
+def are_array_values_increasing(arr):
+    # Calculating length
+    n = len(arr)
+
+    # Array has one or no element or the
+    # rest are already checked and approved.
+    if n == 1 or n == 0:
+        return True
+
+    # Recursion applied till last element
+    return arr[0] < arr[1] and are_array_values_increasing(arr[1:])

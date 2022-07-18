@@ -77,7 +77,7 @@ class BotsValues:
         self.steering_depletion_h = "0.01"
         # Basic game constants
         self.max_food = "150"
-        self.max_poison = "50"
+        self.max_poison = "25"
         # Chance for foodstuff to be created
         self.food_chance = "0.1"
         self.poison_chance = "0.01"

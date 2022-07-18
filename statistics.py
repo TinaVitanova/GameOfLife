@@ -27,6 +27,8 @@ class Statistics:
         self.avg_nutrition_poison_h = []
         self.avg_health_depletion_c = []
         self.avg_health_depletion_h = []
+        self.avg_age_h = []
+        self.avg_age_c = []
 
     def update(self, var, value, suffix, action='add'):
         attr = getattr(self, f'avg_{var}', None)
@@ -54,6 +56,12 @@ class Statistics:
             attr.append((dt, num_bots + 1))
         else:
             attr.append((dt, num_bots - 1))
+        setattr(self, var, attr)
+
+    def update_age(self, var, value):
+        attr = getattr(self, var, [])
+        dt = md.date2num(datetime.now())
+        attr.append((dt, value))
         setattr(self, var, attr)
 
     def update_foodstuffs(self, var, action='add'):

@@ -1,5 +1,5 @@
 import pygame as pg
-import random
+import constants
 
 
 class Button(object):
@@ -47,18 +47,12 @@ class Button(object):
                 self.clicked_text = self.font.render(self.text, True, color)
             self.text = self.font.render(self.text, True, self.font_color)
 
-    def check_event(self, event):
+    def check_event(self, event, input_boxes):
         """The button needs to be passed events from your program event loop."""
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-            print('dear loooord')
-            print(event.type)
-            print(event.button)
             self.on_click(event)
         elif event.type == pg.MOUSEBUTTONUP and event.button == 1:
-            print('dear aaaaaaaaaaaaaaaaaa')
-            print(event.type)
-            print(event.button)
-            self.on_release(event)
+            self.on_release(input_boxes)
 
     def on_click(self, event):
         if self.rect.collidepoint(event.pos):
@@ -66,9 +60,14 @@ class Button(object):
             if not self.call_on_release:
                 self.function()
 
-    def on_release(self, event):
+    def on_release(self, input_boxes):
         if self.clicked and self.call_on_release:
-            self.function()
+            errors = None
+            for box in input_boxes:
+                if box.color == constants.red:
+                    errors = True
+            if not errors:
+                self.function()
         self.clicked = False
 
     def check_hover(self):
