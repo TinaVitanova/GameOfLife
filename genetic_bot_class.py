@@ -207,8 +207,8 @@ class BotClass:
         for food_or_poison in list_of_food_or_poison[::-1]:
             item_x = food_or_poison[0]
             item_y = food_or_poison[1]
-            # #   Check first by x and then calculate hypot
-            if abs(item_x - bot_x) < self.dna[2 + index]:
+            # #   Check first by x and y and then calculate hypot
+            if abs(item_x - bot_x) < self.dna[2 + index] and abs(item_y - bot_y) < self.dna[2 + index]:
                 #   If bot has something within it's view go towards it
                 distance = math.hypot(bot_x - item_x, bot_y - item_y)
                 if distance < 5:
@@ -245,16 +245,16 @@ class BotClass:
                 continue
             item_x = bot_food.position[0]
             item_y = bot_food.position[1]
-            #   Check first by x and then calculate hyplot
+            #   Check first by x and y and then calculate hyplot
             #   If bot has something within it's view go towards it
-            if abs(item_x - bot_x) < self.dna[2 + index]:
+            if abs(item_x - bot_x) < self.dna[2 + index] and abs(item_y - bot_y) < self.dna[2 + index]:
                 distance = math.hypot(bot_x - item_x, bot_y - item_y)
                 if distance < 5:
                     # If it can catch it then eat it
-                    bot_food.be_eaten()
                     self.health += self.dna[8]
                     if self.health >= self.dna[7]:
                         self.health = self.dna[7]
+                    bot_food.be_eaten()
                     continue
                 if distance < closest_distance:
                     # Constantly check if there is a bot that is closer

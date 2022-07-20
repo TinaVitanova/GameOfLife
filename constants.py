@@ -37,14 +37,14 @@ class BotsValues:
         self.steering_perception_c = "30"
         self.steering_perception_h = "30"
         # reproduction_rate - chance of bot to reproduce
-        self.reproduction_rate_c = "0.0005"
-        self.reproduction_rate_h = "0.0005"
+        self.reproduction_rate_c = "0.00025"
+        self.reproduction_rate_h = "0.00025"
         # steering reproduction_rate - range to change dna of chance of bot to reproduce
-        self.steering_reproduction_rate_c = "0.00005"
-        self.steering_reproduction_rate_h = "0.00005"
+        self.steering_reproduction_rate_c = "0.00001"
+        self.steering_reproduction_rate_h = "0.00001"
         # mutation_rate - chance for child of parent to have a mutation
-        self.mutation_rate_c = "0.2"
-        self.mutation_rate_h = "0.2"
+        self.mutation_rate_c = "0.15"
+        self.mutation_rate_h = "0.15"
         # steering mutation_rate - range to change the chance for child of parent to have a mutation
         self.steering_mutation_rate_c = "0.01"
         self.steering_mutation_rate_h = "0.01"
@@ -76,8 +76,8 @@ class BotsValues:
         self.steering_depletion_c = "0.01"
         self.steering_depletion_h = "0.01"
         # Basic game constants
-        self.max_food = "150"
-        self.max_poison = "25"
+        self.max_food = "100"
+        self.max_poison = "20"
         # Chance for foodstuff to be created
         self.food_chance = "0.1"
         self.poison_chance = "0.01"
