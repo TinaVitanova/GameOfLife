@@ -29,7 +29,7 @@ class InputBox:
                 self.active = False
                 if self.text:
                     if self.n_type == 'FLOAT':
-                        number = float(self.text)
+                        number = round(float(self.text), 10)
                     else:
                         number = int(float(self.text))
                     if self.validation == 'greater_than_zero' and number > 0:

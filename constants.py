@@ -17,7 +17,7 @@ class BotsValues:
         # suffix _h is for herbivore bots
         # number of bots
         self.num_of_herbivore_bots = "10"
-        self.num_of_carnivore_bots = "2"
+        self.num_of_carnivore_bots = "4"
         # attr_to_food - initial values for attraction to food for first gen of bots (not children)
         self.attr_to_food_c = "0.02"
         self.attr_to_food_h = "0.02"
@@ -83,14 +83,14 @@ class BotsValues:
         self.poison_chance = "0.01"
 
     def set_attr(self, attr, value):
-        setattr(self, attr, float(value))
+        setattr(self, attr, round(float(value), 10))
 
     def get_attr(self, attr, number_type='FLOAT'):
         if number_type == 'INT':
             return int(getattr(self, attr, 0))
         if number_type == 'STR':
             return getattr(self, attr, 0)
-        return float(getattr(self, attr, 0))
+        return round(float(getattr(self, attr, 0)), 10)
 
 
 botsValues = BotsValues()

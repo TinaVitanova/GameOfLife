@@ -7,6 +7,7 @@ import numpy
 import pygame
 import matplotlib.pyplot as plt
 import matplotlib.dates as md
+import csv
 
 import bots_array
 import constants
@@ -79,6 +80,12 @@ def end_game():
         ax.xaxis.set_major_formatter(xfmt)
         stat = stats.get_statistics(stat_name)
         plt.scatter(*zip(*stat))
+        with open('sim3.csv', 'a', encoding='UTF8', newline='') as f:
+            writer = csv.writer(f)
+            # write the header
+            writer.writerow(['Time', stat_name.replace("_", " ").capitalize()])
+            # write multiple rows
+            writer.writerows([list(ele) for ele in stat])
     plt.show()
     set_game()
 
@@ -114,6 +121,9 @@ def check_termination_conditions():
         end_game()
     elif numpy.std(list(stats_arr_c)[index_to_check_c:]) < 0.1:
         print('Terminated with stable-ish env of carnivore types')
+        end_game()
+    elif list(stats_arr_c)[-1] == 0 and list(stats_arr_h)[-1] == 0:
+        print('Terminated with no achieved stable environment (both types have died out)')
         end_game()
     else:
         print('No achieved stable environment')
@@ -340,29 +350,34 @@ def main():
                     len(food_array.get_food()) < getValue("max_food", 'INT'):
                 stats.update_foodstuffs('num_food', 'add')
                 # Add in num of food stat
-                food_array.add_food(numpy.array([random.SystemRandom().uniform(constants.boundary_size,
-                                                                               constants.game_width -
-                                                                               constants.boundary_size),
-                                                 random.SystemRandom().uniform(constants.boundary_size,
-                                                                               constants.game_height -
-                                                                               constants.boundary_size)],
-                                                dtype='float32'))
+                food_array.add_food((random.SystemRandom().uniform(constants.boundary_size,
+                                                                   constants.game_width -
+                                                                   constants.boundary_size),
+                                     random.SystemRandom().uniform(constants.boundary_size,
+                                                                   constants.game_height -
+                                                                   constants.boundary_size)))
             if random.SystemRandom().random() < getValue("poison_chance") and \
                     len(poison_array.get_poison()) < getValue("max_poison", 'INT'):
                 stats.update_foodstuffs('num_poison', 'add')
                 # Add in num of poison stat
-                poison_array.add_poison(numpy.array([random.SystemRandom().uniform(constants.boundary_size,
-                                                                                   constants.game_width -
-                                                                                   constants.boundary_size),
-                                                     random.SystemRandom().uniform(constants.boundary_size,
-                                                                                   constants.game_height -
-                                                                                   constants.boundary_size)],
-                                                    dtype='float32'))
+                poison_array.add_poison((random.SystemRandom().uniform(constants.boundary_size,
+                                                                       constants.game_width -
+                                                                       constants.boundary_size),
+                                         random.SystemRandom().uniform(constants.boundary_size,
+                                                                       constants.game_height -
+                                                                       constants.boundary_size)))
             # Go through all bots and fire out eat method in order to search for food on every update
             for bot in bots_array.get_bots()[::-1]:
                 if bot.bot_type == 1:
-                    bot.eat(food_array.get_food(), 0, food_array.remove_food)
-                    bot.eat(poison_array.get_poison(), 1, poison_array.remove_poison)
+                    closest_distance_food, closest_food, index_food = bot.eat(food_array.get_food(), 0,
+                                                                              food_array.remove_food)
+                    closest_distance_poison, closest_poison, index_poison = bot.eat(poison_array.get_poison(), 1,
+                                                                                    poison_array.remove_poison)
+                    # TODO: find function to even out attraction and closeness
+                    if closest_distance_food < closest_distance_poison:
+                        bot.seek_closest(closest_distance_food, closest_food, index_food)
+                    else:
+                        bot.seek_closest(closest_distance_poison, closest_poison, index_poison)
                 if bot.bot_type == 2:
                     bot.eat_bot(bots_array.get_bots_by_type(1), 0, 1)
                 # Check if bot is hitting a boundary
