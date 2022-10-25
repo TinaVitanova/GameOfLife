@@ -1,5 +1,5 @@
 import math
-import random
+from random import SystemRandom
 
 import numpy
 import pygame
@@ -11,6 +11,8 @@ import util_functions
 from statistics import stats
 
 getValue = constants.botsValues.get_attr
+
+rand = SystemRandom()
 
 dna_values = [
     "attr_food",
@@ -33,7 +35,7 @@ class BotClass:
         self.position = numpy.array([x, y], dtype='float32')
         # where to move towards
         self.step_movement = numpy.array(
-            [random.SystemRandom().uniform(-10, 10), random.SystemRandom().uniform(-10, 10)], dtype='float32')
+            [rand.uniform(-10, 10), rand.uniform(-10, 10)], dtype='float32')
         self.acceleration = numpy.array([0, 0], dtype='float32')
         self.colour = constants.green
         self.health = 0
@@ -48,91 +50,91 @@ class BotClass:
         if dna:
             self.dna = []
             for dna_property in range(len(dna)):
-                if random.SystemRandom().random() < dna[5]:
+                if rand.random() < dna[5]:
                     if dna_property in [0, 1]:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_attr{self.suffix}"),
                             getValue(f"steering_attr{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property]))
                     elif dna_property in [2, 3]:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_perception{self.suffix}"),
                             getValue(f"steering_perception{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'greater_than_zero'))
                     elif dna_property == 4:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_reproduction_rate{self.suffix}"),
                             getValue(f"steering_reproduction_rate{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'zero_and_above'))
                     elif dna_property == 5:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_mutation_rate{self.suffix}"),
                             getValue(f"steering_mutation_rate{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'zero_and_above'))
                     elif dna_property == 6:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_velocity{self.suffix}"),
                             getValue(f"steering_velocity{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'greater_than_zero'))
                     elif dna_property == 7:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_health{self.suffix}"),
                             getValue(f"steering_health{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'greater_than_zero'))
                     elif dna_property in [8, 9]:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_nutrition{self.suffix}"),
                             getValue(f"steering_nutrition{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'greater_than_zero'))
                     elif dna_property == 10:
-                        new_value = dna[dna_property] + round(random.SystemRandom().uniform(
+                        new_value = dna[dna_property] + round(rand.uniform(
                             -getValue(f"steering_depletion{self.suffix}"),
                             getValue(f"steering_depletion{self.suffix}")), 10)
                         self.dna.append(util_functions.validate_dna(new_value, dna[dna_property], 'greater_than_zero'))
                 else:
                     self.dna.append(dna[dna_property])
         else:
-            attr_to_food = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            attr_to_food = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"attr_to_food{self.suffix}") - getValue(f"steering_attr{self.suffix}"),
                 getValue(f"attr_to_food{self.suffix}") + getValue(f"steering_attr{self.suffix}"),
             ), 10), getValue(f"attr_to_food{self.suffix}"))
-            attr_to_poison = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            attr_to_poison = util_functions.validate_dna(round(rand.uniform(
                 -getValue(f"attr_to_poison{self.suffix}") - getValue(f"steering_attr{self.suffix}"),
                 -getValue(f"attr_to_poison{self.suffix}") + getValue(f"steering_attr{self.suffix}"),
             ), 10), -getValue(f"attr_to_poison{self.suffix}"))
-            perception_food = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            perception_food = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"perception_food{self.suffix}") - getValue(f"steering_perception{self.suffix}"),
                 getValue(f"perception_food{self.suffix}") + getValue(f"steering_perception{self.suffix}")
             ), 10), getValue(f"perception_food{self.suffix}"), 'greater_than_zero')
-            perception_poison = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            perception_poison = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"perception_poison{self.suffix}") - getValue(f"steering_perception{self.suffix}"),
                 getValue(f"perception_poison{self.suffix}") + getValue(f"steering_perception{self.suffix}")
             ), 10), getValue(f"perception_poison{self.suffix}"), 'greater_than_zero')
-            reproduction_rate = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            reproduction_rate = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"reproduction_rate{self.suffix}") - getValue(f"steering_reproduction_rate{self.suffix}"),
                 getValue(f"reproduction_rate{self.suffix}") + getValue(f"steering_reproduction_rate{self.suffix}")
             ), 10), getValue(f"reproduction_rate{self.suffix}"), 'zero_and_above')
-            mutation_rate = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            mutation_rate = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"mutation_rate{self.suffix}") - getValue(f"steering_mutation_rate{self.suffix}"),
                 getValue(f"mutation_rate{self.suffix}") + getValue(f"steering_mutation_rate{self.suffix}")
             ), 10), getValue(f"mutation_rate{self.suffix}"), 'zero_and_above')
-            velocity = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            velocity = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"velocity{self.suffix}") - getValue(f"steering_velocity{self.suffix}"),
                 getValue(f"velocity{self.suffix}") + getValue(f"steering_velocity{self.suffix}")
             ), 10), getValue(f"velocity{self.suffix}"), 'greater_than_zero')
-            health = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            health = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"health{self.suffix}") - getValue(f"steering_health{self.suffix}"),
                 getValue(f"health{self.suffix}") + getValue(f"steering_health{self.suffix}")
             ), 10), getValue(f"health{self.suffix}"), 'greater_than_zero')
-            nutrition_food = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            nutrition_food = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"nutrition_food{self.suffix}") - getValue(f"steering_nutrition{self.suffix}"),
                 getValue(f"nutrition_food{self.suffix}") + getValue(f"steering_nutrition{self.suffix}")
             ), 10), getValue(f"nutrition_food{self.suffix}"), 'greater_than_zero')
-            nutrition_poison = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            nutrition_poison = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"nutrition_poison{self.suffix}") - getValue(f"steering_nutrition{self.suffix}"),
                 getValue(f"nutrition_poison{self.suffix}") + getValue(f"steering_nutrition{self.suffix}")
             ), 10), getValue(f"nutrition_poison{self.suffix}"), 'greater_than_zero')
-            health_depletion = util_functions.validate_dna(round(random.SystemRandom().uniform(
+            health_depletion = util_functions.validate_dna(round(rand.uniform(
                 getValue(f"health_depletion{self.suffix}") - getValue(f"steering_depletion{self.suffix}"),
                 getValue(f"health_depletion{self.suffix}") + getValue(f"steering_depletion{self.suffix}")
             ), 10), getValue(f"health_depletion{self.suffix}"), 'greater_than_zero')
@@ -159,7 +161,9 @@ class BotClass:
         self.step_movement += self.acceleration
 
         self.step_movement = util_functions.normalise(self.step_movement) * self.dna[6]
-        self.position += self.step_movement
+        self.position += numpy.array([round(self.step_movement[0], 2), round(self.step_movement[1], 2)],
+                                     dtype='float32')
+        self.position = numpy.array([round(self.position[0], 2), round(self.position[1], 2)], dtype='float32')
         self.acceleration *= 0
         # Every movement takes away health
         self.health -= self.dna[10]
@@ -169,10 +173,12 @@ class BotClass:
         self.age += 1
 
     def reproduce(self, bots):
+        # Old range for the health is the maximum allotted health a bot can have
         old_range = self.dna[7]
+        # New range is going to allow the current health to have an impact on only 10 percent of the reproduction rate
         new_range = (self.dna[4] / 10)
         normalized_health = (self.health * new_range) / old_range
-        if random.SystemRandom().random() < (self.dna[4] + normalized_health):
+        if rand.random() < (self.dna[4] + normalized_health):
             stats.update_bots(f'num{self.suffix}_bots', 'add')
             bots.append(BotClass(self.position[0], self.position[1], self.bot_type, self.dna))
 
@@ -305,6 +311,7 @@ class BotClass:
             pos = pygame.mouse.get_pos()
             distance = math.hypot(pos[0] - self.position[0], pos[1] - self.position[1])
             if distance < 10:
+                print(self.position)
                 return self.dna, self.position, self.health
             return
 

@@ -1,4 +1,4 @@
-import random
+from random import SystemRandom
 import threading
 import bisect
 from datetime import datetime, timedelta
@@ -28,6 +28,8 @@ WHITE = (255, 255, 255)
 ORANGE = (255, 180, 0)
 
 getValue = constants.botsValues.get_attr
+
+rand = SystemRandom()
 
 # The button can be styled in a manner similar to CSS.
 BUTTON_STYLE = {"hover_color": (0, 180, 0),
@@ -71,17 +73,18 @@ def end_game():
     statistics = vars(stats)
     # xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
     xfmt = md.DateFormatter('%H:%M:%S')
-    for i, stat_name in enumerate(statistics):
-        plt.figure(i + 1)
-        ax = plt.gca()
-        plt.subplots_adjust(bottom=0.2)
-        plt.xticks(rotation=45)
-        plt.title(stat_name.replace("_", " ").capitalize())
-        ax.xaxis.set_major_formatter(xfmt)
-        stat = stats.get_statistics(stat_name)
-        plt.scatter(*zip(*stat))
-        with open('sim3.csv', 'a', encoding='UTF8', newline='') as f:
-            writer = csv.writer(f)
+    file_date_name = datetime.now().strftime("%m_%d_%Y__%H_%M_%S")
+    with open(f'./sim_{file_date_name}.csv', 'a', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        for i, stat_name in enumerate(statistics):
+            plt.figure(i + 1)
+            ax = plt.gca()
+            plt.subplots_adjust(bottom=0.2)
+            plt.xticks(rotation=45)
+            plt.title(stat_name.replace("_", " ").capitalize())
+            ax.xaxis.set_major_formatter(xfmt)
+            stat = stats.get_statistics(stat_name)
+            plt.scatter(*zip(*stat))
             # write the header
             writer.writerow(['Time', stat_name.replace("_", " ").capitalize()])
             # write multiple rows
@@ -144,12 +147,12 @@ def set_game():
         # create n random bots at the start of the game form inputs
         for _ in range(getValue("num_of_herbivore_bots", 'INT')):
             stats.update_bots('num_h_bots', 'add')
-            bots_array.add_bots(BotClass(random.SystemRandom().uniform(0, constants.game_width),
-                                         random.SystemRandom().uniform(0, constants.game_height), 1))
+            bots_array.add_bots(BotClass(round(rand.uniform(0, constants.game_width), 2),
+                                         round(rand.uniform(0, constants.game_height), 2), 1))
         for _ in range(getValue("num_of_carnivore_bots", 'INT')):
             stats.update_bots('num_c_bots', 'add')
-            bots_array.add_bots(BotClass(random.SystemRandom().uniform(0, constants.game_width),
-                                         random.SystemRandom().uniform(0, constants.game_height), 2))
+            bots_array.add_bots(BotClass(round(rand.uniform(0, constants.game_width), 2),
+                                         round(rand.uniform(0, constants.game_height), 2), 2))
         save_statistics()
     game_set = not game_set
 
@@ -167,7 +170,7 @@ def show_data(text, font):
 
 
 def message_display(text, x, y):
-    large_text = pygame.font.Font(None, 20)
+    large_text = pygame.font.SysFont('Arial', 20)
     text_surface, text_rect = text_objects(text, large_text)
     text_rect.bottom = y
     text_rect.left = x
@@ -341,31 +344,31 @@ def main():
                     if bot.check_event(pygame_event):
                         show_data_bot = bot
                 pygame.event.clear()
-            # if len(bots_array.get_bots) < 10 or random.SystemRandom().random() < 0.0001:
-            #     bots_array.add_bots(BotClass(random.SystemRandom().uniform(0, game_width),
-            #     random.SystemRandom().uniform(0, game_height), 2))
+            # if len(bots_array.get_bots) < 10 or rand.random() < 0.0001:
+            #     bots_array.add_bots(BotClass(rand.uniform(0, game_width),
+            #     rand.uniform(0, game_height), 2))
 
             # Generate foodstuffs in random places if there are not above their max limit
-            if random.SystemRandom().random() < getValue("food_chance") and \
+            if rand.random() < getValue("food_chance") and \
                     len(food_array.get_food()) < getValue("max_food", 'INT'):
                 stats.update_foodstuffs('num_food', 'add')
                 # Add in num of food stat
-                food_array.add_food((random.SystemRandom().uniform(constants.boundary_size,
-                                                                   constants.game_width -
-                                                                   constants.boundary_size),
-                                     random.SystemRandom().uniform(constants.boundary_size,
-                                                                   constants.game_height -
-                                                                   constants.boundary_size)))
-            if random.SystemRandom().random() < getValue("poison_chance") and \
+                food_array.add_food((rand.uniform(constants.boundary_size,
+                                                  constants.game_width -
+                                                  constants.boundary_size),
+                                     rand.uniform(constants.boundary_size,
+                                                  constants.game_height -
+                                                  constants.boundary_size)))
+            if rand.random() < getValue("poison_chance") and \
                     len(poison_array.get_poison()) < getValue("max_poison", 'INT'):
                 stats.update_foodstuffs('num_poison', 'add')
                 # Add in num of poison stat
-                poison_array.add_poison((random.SystemRandom().uniform(constants.boundary_size,
-                                                                       constants.game_width -
-                                                                       constants.boundary_size),
-                                         random.SystemRandom().uniform(constants.boundary_size,
-                                                                       constants.game_height -
-                                                                       constants.boundary_size)))
+                poison_array.add_poison((rand.uniform(constants.boundary_size,
+                                                      constants.game_width -
+                                                      constants.boundary_size),
+                                         rand.uniform(constants.boundary_size,
+                                                      constants.game_height -
+                                                      constants.boundary_size)))
             # Go through all bots and fire out eat method in order to search for food on every update
             for bot in bots_array.get_bots()[::-1]:
                 if bot.bot_type == 1:
@@ -402,13 +405,20 @@ def main():
 
             # Draw foodstuffs
             for i in food_array.get_food():
-                pygame.draw.circle(pygame_screen.game_display, (0, 255, 0), (int(i[0]), int(i[1])), 3)
+                # pygame.draw.circle(pygame_screen.game_display, (0, 255, 0), (int(i[0]), int(i[1])), 3)
+                rect_green = pygame.Surface((4, 4))
+                rect_green.fill((0, 255, 0))
+                pygame_screen.game_display.blit(rect_green, (int(i[0]), int(i[1])))
             for i in poison_array.get_poison():
-                pygame.draw.circle(pygame_screen.game_display, (255, 0, 0), (int(i[0]), int(i[1])), 3)
+                # pygame.draw.circle(pygame_screen.game_display, (255, 0, 0), (int(i[0]), int(i[1])), 3)
+                rect_green = pygame.Surface((4, 4))
+                rect_green.fill((255, 0, 0))
+                pygame_screen.game_display.blit(rect_green, (int(i[0]), int(i[1])))
 
             if show_data_bot:
-                message_display(f'X: {show_data_bot.position[0]}', 10, 20)
-                message_display(f'Y: {show_data_bot.position[1]}', 10, 40)
+                print(show_data_bot.position)
+                message_display(f'X: {round(show_data_bot.position[0], 2)}', 10, 20)
+                message_display(f'Y: {round(show_data_bot.position[1], 2)}', 10, 40)
                 message_display(f'Health: {show_data_bot.health}', 10, 60)
                 message_display(f'Max health: {show_data_bot.dna[7]}', 10, 80)
                 message_display(f'Health depletion: {show_data_bot.dna[10]}', 10, 100)

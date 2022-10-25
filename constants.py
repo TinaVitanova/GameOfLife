@@ -1,7 +1,7 @@
 #  PYGAME constants
 game_width = 1450
 game_height = 800
-fps = 50
+fps = 30
 boundary_size = 10
 #   Color constants
 white = (255, 255, 255)

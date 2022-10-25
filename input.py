@@ -3,7 +3,7 @@ import constants
 
 botsValues = constants.botsValues
 
-FONT = pg.font.Font(None, 32)
+FONT = pg.font.SysFont("Arial", 32)
 
 
 class InputBox:
