@@ -83,7 +83,10 @@ class BotsValues:
         self.poison_chance = "0.01"
 
     def set_attr(self, attr, value):
-        setattr(self, attr, round(float(value), 10))
+        try:
+            setattr(self, attr, round(float(value), 10))
+        except ValueError:
+            print(f'Can not set attribute {attr} with value {value}')
 
     def get_attr(self, attr, number_type='FLOAT'):
         if number_type == 'INT':
@@ -91,6 +94,75 @@ class BotsValues:
         if number_type == 'STR':
             return getattr(self, attr, 0)
         return round(float(getattr(self, attr, 0)), 10)
+
+    def get_all_attr(self):
+        return (
+            (
+                self.get_attr("num_of_herbivore_bots", "STR"),
+                "num_of_herbivore_bots",
+            ),
+            (self.get_attr("attr_to_food_h", "STR"), "attr_to_food_h"),
+            (self.get_attr("attr_to_poison_h", "STR"), "attr_to_poison_h"),
+            (self.get_attr("steering_attr_h", "STR"), "steering_attr_h"),
+            (self.get_attr("perception_food_h", "STR"), "perception_food_h"),
+            (self.get_attr("perception_poison_h", "STR"), "perception_poison_h"),
+            (
+                self.get_attr("steering_perception_h", "STR"),
+                "steering_perception_h",
+            ),
+            (self.get_attr("reproduction_rate_h", "STR"), "reproduction_rate_h"),
+            (
+                self.get_attr("steering_reproduction_rate_h", "STR"),
+                "steering_reproduction_rate_h",
+            ),
+            (self.get_attr("mutation_rate_h", "STR"), "mutation_rate_h"),
+            (
+                self.get_attr("steering_mutation_rate_h", "STR"),
+                "steering_mutation_rate_h",
+            ),
+            (self.get_attr("velocity_h", "STR"), "velocity_h"),
+            (self.get_attr("steering_velocity_h", "STR"), "steering_velocity_h"),
+            (self.get_attr("health_h", "STR"), "health_h"),
+            (self.get_attr("steering_health_h", "STR"), "steering_health_h"),
+            (self.get_attr("nutrition_food_h", "STR"), "nutrition_food_h"),
+            (self.get_attr("nutrition_poison_h", "STR"), "nutrition_poison_h"),
+            (self.get_attr("steering_nutrition_h", "STR"), "steering_nutrition_h"),
+            (self.get_attr("health_depletion_h", "STR"), "health_depletion_h"),
+            (self.get_attr("steering_depletion_h", "STR"), "steering_depletion_h"),
+            (
+                self.get_attr("num_of_carnivore_bots", "STR"),
+                "num_of_carnivore_bots",
+            ),
+            (self.get_attr("attr_to_food_c", "STR"), "attr_to_food_c"),
+            (self.get_attr("steering_attr_c", "STR"), "steering_attr_c"),
+            (self.get_attr("perception_food_c", "STR"), "perception_food_c"),
+            (
+                self.get_attr("steering_perception_c", "STR"),
+                "steering_perception_c",
+            ),
+            (self.get_attr("reproduction_rate_c", "STR"), "reproduction_rate_c"),
+            (
+                self.get_attr("steering_reproduction_rate_c", "STR"),
+                "steering_reproduction_rate_c",
+            ),
+            (self.get_attr("mutation_rate_c", "STR"), "mutation_rate_c"),
+            (
+                self.get_attr("steering_mutation_rate_c", "STR"),
+                "steering_mutation_rate_c",
+            ),
+            (self.get_attr("velocity_c", "STR"), "velocity_c"),
+            (self.get_attr("steering_velocity_c", "STR"), "steering_velocity_c"),
+            (self.get_attr("health_c", "STR"), "health_c"),
+            (self.get_attr("steering_health_c", "STR"), "steering_health_c"),
+            (self.get_attr("nutrition_food_c", "STR"), "nutrition_food_c"),
+            (self.get_attr("steering_nutrition_c", "STR"), "steering_nutrition_c"),
+            (self.get_attr("health_depletion_c", "STR"), "health_depletion_c"),
+            (self.get_attr("steering_depletion_c", "STR"), "steering_depletion_c"),
+            (self.get_attr("max_food", "STR"), "max_food"),
+            (self.get_attr("max_poison", "STR"), "max_poison"),
+            (self.get_attr("food_chance", "STR"), "food_chance"),
+            (self.get_attr("poison_chance", "STR"), "poison_chance"),
+        )
 
 
 botsValues = BotsValues()

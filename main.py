@@ -28,6 +28,7 @@ WHITE = (255, 255, 255)
 ORANGE = (255, 180, 0)
 
 getValue = constants.botsValues.get_attr
+getAllValues = constants.botsValues.get_all_attr
 
 rand = SystemRandom()
 
@@ -74,6 +75,8 @@ def end_game():
     # xfmt = md.DateFormatter('%Y-%m-%d %H:%M:%S')
     xfmt = md.DateFormatter('%H:%M:%S')
     file_date_name = datetime.now().strftime("%m_%d_%Y__%H_%M_%S")
+    with open(f"./sim_{file_date_name}.txt", "w") as f:
+        f.write(' || '.join(', '.join(item) for item in getAllValues()))
     with open(f'./sim_{file_date_name}.csv', 'a', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         for i, stat_name in enumerate(statistics):
@@ -89,6 +92,7 @@ def end_game():
             writer.writerow(['Time', stat_name.replace("_", " ").capitalize()])
             # write multiple rows
             writer.writerows([list(ele) for ele in stat])
+
     plt.show()
     set_game()
 
@@ -122,7 +126,7 @@ def check_termination_conditions():
     elif numpy.std(list(stats_arr_h)[index_to_check_h:]) < 0.1:
         print('Terminated with stable-ish env of herbivore types')
         end_game()
-    elif numpy.std(list(stats_arr_c)[index_to_check_c:]) < 0.1:
+    elif numpy.std(list(stats_arr_c)[index_to_check_c:]) < 0.01:
         print('Terminated with stable-ish env of carnivore types')
         end_game()
     elif list(stats_arr_c)[-1] == 0 and list(stats_arr_h)[-1] == 0:

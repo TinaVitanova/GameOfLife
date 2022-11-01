@@ -28,13 +28,20 @@ class InputBox:
             else:
                 self.active = False
                 if self.text:
+                    number = None
                     if self.n_type == 'FLOAT':
-                        number = round(float(self.text), 10)
+                        try:
+                            number = round(float(self.text), 10)
+                        except ValueError:
+                            print(f'Can not set parse number {self.text}')
                     else:
-                        number = int(float(self.text))
-                    if self.validation == 'greater_than_zero' and number > 0:
+                        try:
+                            number = int(float(self.text))
+                        except ValueError:
+                            print(f'Can not set parse number {self.text}')
+                    if self.validation == 'greater_than_zero' and number and number > 0:
                         self.color = constants.blue
-                    elif self.validation == 'zero_and_above' and number >= 0:
+                    elif self.validation == 'zero_and_above' and number and number >= 0:
                         self.color = constants.blue
                     else:
                         self.color = constants.red

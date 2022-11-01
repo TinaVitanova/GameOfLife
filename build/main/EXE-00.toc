@@ -60,7 +60,7 @@
  [],
  False,
  False,
- 1665598562,
+ 1666716071,
  [('run.exe',
    'C:\\Users\\mavitanova\\AppData\\Roaming\\Python\\Python39\\site-packages\\PyInstaller\\bootloader\\Windows-64bit\\run.exe',
    'EXECUTABLE')])
