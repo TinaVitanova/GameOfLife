@@ -2,6 +2,7 @@ from random import SystemRandom
 import threading
 import bisect
 from datetime import datetime, timedelta
+import sys
 
 import numpy
 import pygame
@@ -19,6 +20,8 @@ from input import InputBox
 from statistics import stats
 from interval import ThreadJob
 from util_functions import are_array_values_increasing
+
+sys.setrecursionlimit(2000)
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -76,7 +79,7 @@ def end_game():
     xfmt = md.DateFormatter('%H:%M:%S')
     file_date_name = datetime.now().strftime("%m_%d_%Y__%H_%M_%S")
     with open(f"./sim_{file_date_name}.txt", "w") as f:
-        f.write(' || '.join(', '.join(item) for item in getAllValues()))
+        f.write(' || '.join(', '.join(str(item)) for item in getAllValues()))
     with open(f'./sim_{file_date_name}.csv', 'a', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)
         for i, stat_name in enumerate(statistics):
@@ -300,10 +303,10 @@ def main():
                                           getValue("steering_depletion_c", "STR"),
                                           "steering_depletion_c")
     input_max_food = InputBox(1210, 100, 150, 32,
-                              str(getValue("max_food")),
+                              getValue("max_food", "STR"),
                               "max_food", "INT", 'zero_and_above')
     input_max_poison = InputBox(1210, 160, 150, 32,
-                                str(getValue("max_poison")),
+                                getValue("max_poison", "STR"),
                                 "max_poison", "INT", 'zero_and_above')
     input_food_chance = InputBox(1210, 220, 150, 32,
                                  str(getValue("food_chance")),
@@ -344,15 +347,16 @@ def main():
                 if self_event.type == pygame.KEYUP and self_event.key == pygame.K_p:
                     end_game()
 
-                for bot in bots_array.get_bots()[::-1]:
-                    if bot.check_event(pygame_event):
-                        show_data_bot = bot
+                if pygame_event.type == pygame.MOUSEBUTTONDOWN:
+                    for bot in bots_array.get_bots()[::-1]:
+                        if bot.check_event(pygame_event):
+                            show_data_bot = bot
                 pygame.event.clear()
             # if len(bots_array.get_bots) < 10 or rand.random() < 0.0001:
             #     bots_array.add_bots(BotClass(rand.uniform(0, game_width),
             #     rand.uniform(0, game_height), 2))
 
-            # Generate foodstuffs in random places if there are not above their max limit
+            # Generate foodstuffs in random places if they are not above their max limit
             if rand.random() < getValue("food_chance") and \
                     len(food_array.get_food()) < getValue("max_food", 'INT'):
                 stats.update_foodstuffs('num_food', 'add')
@@ -420,7 +424,6 @@ def main():
                 pygame_screen.game_display.blit(rect_green, (int(i[0]), int(i[1])))
 
             if show_data_bot:
-                print(show_data_bot.position)
                 message_display(f'X: {round(show_data_bot.position[0], 2)}', 10, 20)
                 message_display(f'Y: {round(show_data_bot.position[1], 2)}', 10, 40)
                 message_display(f'Health: {show_data_bot.health}', 10, 60)

@@ -37,11 +37,12 @@ class BotClass:
         self.step_movement = numpy.array(
             [rand.uniform(-10, 10), rand.uniform(-10, 10)], dtype='float32')
         self.acceleration = numpy.array([0, 0], dtype='float32')
-        self.colour = constants.green
+        self.colour = constants.green if bot_type == 1 else constants.aqua
         self.health = 0
         # Turning speed and angle
         self.max_force = 0.5
         self.age = 1
+        self.rect_bot = pygame.Surface((10, 10)) if bot_type == 1 else pygame.Surface((16, 8))
         self.bot_type = bot_type
 
         # dna=[1 - attracted to food, 2 - attracted to poison, 3 - see food, 4 - see poison, 5 - reproduction rate,
@@ -311,13 +312,13 @@ class BotClass:
             pos = pygame.mouse.get_pos()
             distance = math.hypot(pos[0] - self.position[0], pos[1] - self.position[1])
             if distance < 10:
-                print(self.position)
                 return self.dna, self.position, self.health
             return
 
     def draw_bot(self, game_display):
+        self.rect_bot.fill(self.colour)
         # Draw bot with different body by type
-        bot_draw_type.draw_bot_by_type(self, game_display)
+        bot_draw_type.draw_bot_by_type(self, game_display, self.rect_bot)
         num_c = stats.get_statistics('num_c_bots')[-1][-1] if stats.get_statistics('num_c_bots') else 0
         num_h = stats.get_statistics('num_h_bots')[-1][-1] if stats.get_statistics('num_h_bots') else 0
         if num_c + num_h < 500:

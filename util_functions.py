@@ -16,10 +16,16 @@ def normalise(vector):
 def lerp(bot):
     # Change color of bot according to it's health
     percent_health = bot.health / constants.botsValues.get_attr("health" + bot.suffix)
+    if bot.bot_type == 1:
+        return (
+            int(max(min((1 - percent_health) * 255, 255), 0)),
+            int(max(min(percent_health * 255, 255), 0)),
+            0,
+        )
     return (
         int(max(min((1 - percent_health) * 255, 255), 0)),
         int(max(min(percent_health * 255, 255), 0)),
-        0,
+        255,
     )
 
 

@@ -3,7 +3,9 @@ import constants
 
 botsValues = constants.botsValues
 
-FONT = pg.font.SysFont("Arial", 32)
+FONT = pg.font.SysFont(None, 32)
+# FONT = pg.font.SysFont("Arial", 32)
+# Need to set to input Arial for .exe version
 
 
 class InputBox:

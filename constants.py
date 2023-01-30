@@ -7,6 +7,8 @@ boundary_size = 10
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (255, 0, 0)
+magenta = (255, 0, 255)
+aqua = (0, 255, 255)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 
@@ -17,7 +19,7 @@ class BotsValues:
         # suffix _h is for herbivore bots
         # number of bots
         self.num_of_herbivore_bots = "10"
-        self.num_of_carnivore_bots = "4"
+        self.num_of_carnivore_bots = "2"
         # attr_to_food - initial values for attraction to food for first gen of bots (not children)
         self.attr_to_food_c = "0.02"
         self.attr_to_food_h = "0.02"
@@ -61,7 +63,7 @@ class BotsValues:
         self.steering_health_c = "5"
         self.steering_health_h = "5"
         # nutrition_food - impact on health eating bot/food will have
-        self.nutrition_food_c = "20"
+        self.nutrition_food_c = "40"
         self.nutrition_food_h = "20"
         # nutrition_poison - impact on health eating poison will have
         self.nutrition_poison_c = "80"
@@ -70,7 +72,7 @@ class BotsValues:
         self.steering_nutrition_c = "1"
         self.steering_nutrition_h = "1"
         # health depletion - deplete some health every update
-        self.health_depletion_c = "0.1"
+        self.health_depletion_c = "0.05"
         self.health_depletion_h = "0.1"
         # steering health depletion - range to change depletion of some health every update
         self.steering_depletion_c = "0.01"
@@ -79,7 +81,7 @@ class BotsValues:
         self.max_food = "100"
         self.max_poison = "20"
         # Chance for foodstuff to be created
-        self.food_chance = "0.1"
+        self.food_chance = "0.2"
         self.poison_chance = "0.01"
 
     def set_attr(self, attr, value):

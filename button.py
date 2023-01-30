@@ -26,9 +26,9 @@ class Button(object):
                     "clicked_color": None,
                     "font_color": pg.Color("white"),
                     "hover_font_color": None,
-                    "clicked_font_color": None,
-                    "click_sound": None,
-                    "hover_sound": None}
+                    "clicked_font_color": None}
+                    # "click_sound": None,
+                    # "hover_sound": None}
         for kwarg in kwargs:
             if kwarg in settings:
                 settings[kwarg] = kwargs[kwarg]
@@ -74,8 +74,8 @@ class Button(object):
         if self.rect.collidepoint(pg.mouse.get_pos()):
             if not self.hovered:
                 self.hovered = True
-                if self.hover_sound:
-                    self.hover_sound.play()
+                # if self.hover_sound:
+                #     self.hover_sound.play()
         else:
             self.hovered = False
 
