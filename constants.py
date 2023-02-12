@@ -30,17 +30,17 @@ class BotsValues:
         self.steering_attr_c = "0.001"
         self.steering_attr_h = "0.001"
         # perception_food - max values for food perception radius for first gen of bots (not children)
-        self.perception_food_c = "100"
+        self.perception_food_c = "80"
         self.perception_food_h = "100"
         # perception_poison - max values for poison perception radius for first gen of bots (not children)
         self.perception_poison_c = "100"
         self.perception_poison_h = "100"
         # steering_perception - range (from to) to change dna of mutated child (perception red/green)
-        self.steering_perception_c = "30"
-        self.steering_perception_h = "30"
+        self.steering_perception_c = "20"
+        self.steering_perception_h = "20"
         # reproduction_rate - chance of bot to reproduce
         self.reproduction_rate_c = "0.00025"
-        self.reproduction_rate_h = "0.00025"
+        self.reproduction_rate_h = "0.00035"
         # steering reproduction_rate - range to change dna of chance of bot to reproduce
         self.steering_reproduction_rate_c = "0.00001"
         self.steering_reproduction_rate_h = "0.00001"
@@ -78,10 +78,10 @@ class BotsValues:
         self.steering_depletion_c = "0.01"
         self.steering_depletion_h = "0.01"
         # Basic game constants
-        self.max_food = "100"
+        self.max_food = "150"
         self.max_poison = "20"
         # Chance for foodstuff to be created
-        self.food_chance = "0.2"
+        self.food_chance = "0.3"
         self.poison_chance = "0.01"
 
     def set_attr(self, attr, value):
